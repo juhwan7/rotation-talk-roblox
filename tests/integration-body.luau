@@ -105,4 +105,15 @@ mockStore.values.u_1.owner = "other-server"
 check(not Data:Save(1, false), "lost ownership cannot save")
 Data.profiles[1].leaseUntil = epoch - 1
 check(Data:Get(1) == nil, "expired lease disables mutations")
+studioMode = true
+local accesses = storeAccesses
+local TempData = loaders.DataService()
+check(storeAccesses == accesses, "temporary mode never requests DataStore")
+local temporaryPlayer = player(99)
+check(TempData:Load(temporaryPlayer), "unpublished Studio profile loads")
+check(temporaryPlayer.attributes.TemporaryData == true, "temporary status shown")
+TempData:Get(99).coins = 40
+check(TempData:Save(99, false) and storeAccesses == accesses, "temporary save stays in memory")
+TempData:Release(temporaryPlayer)
+check(TempData.profiles[99] == nil and storeAccesses == accesses, "temporary release avoids persistence")
 print("PASS: " .. checks .. " server integration checks (mock services)")

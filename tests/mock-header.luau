@@ -17,6 +17,8 @@ function Players:GetPlayerByUserId(id) return players[id] end
 local storage = { RotationTalk = references }
 function storage:WaitForChild() return references end
 local mockStore = { values = {}, fail = false, calls = 0 }
+local studioMode = false
+local storeAccesses = 0
 function mockStore:UpdateAsync(key, callback)
     self.calls += 1
     if self.fail then error("injected storage failure") end
@@ -27,8 +29,12 @@ end
 local game = { JobId = "server-test", GetService = function(_, name)
     if name == "Players" then return Players end
     if name == "ReplicatedStorage" then return storage end
-    if name == "DataStoreService" then return { GetDataStore = function() return mockStore end } end
-    if name == "RunService" then return { IsStudio = function() return false end } end
+    if name == "DataStoreService" then return { GetDataStore = function()
+        storeAccesses += 1
+        if studioMode then error("unpublished Studio place cannot access DataStore") end
+        return mockStore
+    end } end
+    if name == "RunService" then return { IsStudio = function() return studioMode end } end
     if name == "HttpService" then return { GenerateGUID = function() return "test" end } end
     error("unmocked service " .. name)
 end }

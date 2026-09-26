@@ -5,9 +5,10 @@ local Shared = game:GetService("ReplicatedStorage"):WaitForChild("RotationTalk")
 local Config = require(Shared.Config)
 local Rules = require(Shared.Rules)
 local Data = { profiles = {}, closing = false }
-local store = DataStoreService:GetDataStore(Config.StoreName)
 local token = game.JobId ~= "" and game.JobId or HttpService:GenerateGUID(false)
 local temporary = RunService:IsStudio() and not Config.StudioPersistence
+-- Unpublished Studio places must not request a DataStore, even for initialization.
+local store = if temporary then nil else DataStoreService:GetDataStore(Config.StoreName)
 
 local function copy(value)
     if type(value) ~= "table" then return value end
