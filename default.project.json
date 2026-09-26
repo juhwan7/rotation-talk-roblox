@@ -1,0 +1,10 @@
+{
+  "name": "RotationTalk",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": { "RotationTalk": { "$path": "src/shared" } },
+    "ServerScriptService": { "RotationTalk": { "$path": "src/server" } },
+    "StarterPlayer": { "StarterPlayerScripts": { "RotationTalk": { "$path": "src/client" } } },
+    "TextChatService": { "$properties": { "ChatVersion": "TextChatService", "CreateDefaultTextChannels": true, "CreateDefaultCommands": true } }
+  }
+}
