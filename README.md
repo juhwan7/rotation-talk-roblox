@@ -23,6 +23,20 @@
 
 ## 실행
 
+### GitHub에서 최신 장소 파일 받기
+
+**[최신 RotationTalk.rbxlx 다운로드](https://github.com/juhwan7/rotation-talk-roblox/releases/latest/download/RotationTalk.rbxlx)** · [다운로드 페이지](https://github.com/juhwan7/rotation-talk-roblox/releases/latest) · [자동 생성 진행 상황](https://github.com/juhwan7/rotation-talk-roblox/actions/workflows/studio-download.yml)
+
+`main`이 업데이트되면 GitHub Actions(코드를 검사하고 파일을 만드는 자동 작업)가 Luau 컴파일·규칙·서버 모의 시험을 실행하고 장소 파일을 Releases(다운로드용 배포 목록)에 올린다. **최신 링크는 가장 최근에 성공한 개발 빌드**를 가리킨다. 작업이 진행 중이거나 실패했다면 이전 파일이 제공될 수 있으므로 배포 설명의 원본 커밋과 `main` 최신 커밋을 비교한다. 실제 Studio 시험이나 Roblox 게시 완료를 뜻하지 않는다.
+
+1. 위 다운로드 링크에서 `RotationTalk.rbxlx`를 받는다. 배포 페이지를 이용하면 Assets(첨부 파일)를 펼쳐 같은 파일을 선택한다. Source code ZIP은 장소 파일이 아니다.
+2. 현재 Studio의 Play를 중지하고, 직접 편집한 내용이 있으면 별도 파일에 저장한다.
+3. Studio의 File → Open from File에서 **이번에 다운로드한 파일**을 연다. 이름 뒤에 `(1)` 등이 붙었다면 오래된 다운로드와 구분한다.
+4. Play를 누르면 학교 강당과 테이블이 생성된다. 다음에도 이 파일을 열면 같은 버전으로 이어갈 수 있다.
+5. GitHub에서 코드가 다시 변경되면 새 파일을 내려받아 다시 연다. GitHub·현재 열린 Studio·Roblox 온라인 프로젝트는 자동 동기화되지 않는다. 온라인 게임 업데이트는 확인 후 해당 장소에 별도로 저장·게시한다.
+
+### 직접 파일 만들기
+
 Node.js가 있으면 외부 패키지 설치 없이 다음 명령으로 Studio에서 열 수 있는 XML 형식 장소 파일을 만든다.
 
 ```sh
@@ -51,6 +65,8 @@ node tools/build.mjs
 자세한 결과와 미검증 범위는 [TEST_RESULTS](docs/TEST_RESULTS.md)에 기록한다. 명령행 시험은 실제 Roblox 네트워크·물리·채팅·DataStore 서비스 검증을 대체하지 않는다.
 
 ## 구조와 다음 단계
+
+**다운로드 업데이트 — 2026-09-27:** `main` 변경 시 검사 후 `.rbxlx`를 GitHub Releases에 자동 배포하는 작업을 추가했다. 다운로드 주소는 고정되며 각 파일의 원본 커밋과 파일 지문(SHA-256)은 배포 설명에 남긴다. 자동 작업의 실제 성공 여부는 위 진행 상황 링크에서 확인한다.
 
 `src/shared`: 설정·질문·순수 규칙. `src/server`: 라운드·매칭·월드·경제·평판·저장. `src/client`: 한국어 화면 및 입력. `tools`: 장소 빌드와 검사. `tests`: 규칙 및 서버 통합 시험. `docs`: 기획·결정·로드맵·검증·인수인계.
 
