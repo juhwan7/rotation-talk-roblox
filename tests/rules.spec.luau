@@ -34,7 +34,7 @@ check(Rules.canReputation(p, 11, 20, now + 86400, Config), "daily cap reset")
 check(not Rules.completionEligible(2, 600, 600, Config), "insufficient participation")
 check(not Rules.completionEligible(3, 299, 600, Config), "insufficient activity")
 check(Rules.completionEligible(3, 300, 600, Config), "completion threshold")
-for n = 0, 12 do
+for n = 0, Config.MaxPlayers do
     local ids = {}; for i = 1, n do ids[i] = i end
     local matches = Rules.match(ids, function() return true end, function() return 0 end)
     check(#matches == math.floor(n / 2), "pair count " .. n)

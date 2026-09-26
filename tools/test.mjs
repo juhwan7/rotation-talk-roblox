@@ -21,6 +21,7 @@ for (const folder of ['shared', 'server', 'client']) {
 }
 if (!failed) console.log('PASS: every production Luau source compiles');
 run(luau, ['tests/rules.spec.luau']);
+run(luau, ['tests/matching.spec.luau']);
 // Load the actual production modules in a minimal deterministic Roblox service mock.
 // This verifies transitions and trust boundaries, not engine physics or real DataStore.
 let bundle = fs.readFileSync(path.join(root, 'tests/mock-header.luau'), 'utf8');

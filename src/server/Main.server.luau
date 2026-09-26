@@ -15,7 +15,7 @@ local rate = {}
 World:Build(); Economy:Init(Data); Reputation:Init(Data); Round:Init(Data, Economy, Reputation, World, State)
 Data:Start()
 local function joined(player)
-    if #Players:GetPlayers() > Config.MaxPlayers then player:Kick("이 서버는 최대 12명입니다."); return end
+    if #Players:GetPlayers() > Config.MaxPlayers then player:Kick(string.format("이 서버는 최대 %d명입니다.", Config.MaxPlayers)); return end
     if not Data:Load(player) then return end
     Economy:Join(player.UserId)
     player.CharacterAdded:Connect(function(character)

@@ -1,6 +1,9 @@
 -- Server is authoritative; replicated configuration is not a permission boundary.
+local tableCount = 20
 return table.freeze({
-    MaxPlayers = 12,
+    TableCount = tableCount,
+    TableColumns = 4,
+    MaxPlayers = tableCount * 2,
     RoundSeconds = 600, -- 180, 300, 420, 600
     ResultsSeconds = 20,
     IntermissionSeconds = 8,

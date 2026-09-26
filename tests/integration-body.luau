@@ -116,4 +116,38 @@ TempData:Get(99).coins = 40
 check(TempData:Save(99, false) and storeAccesses == accesses, "temporary save stays in memory")
 TempData:Release(temporaryPlayer)
 check(TempData.profiles[99] == nil and storeAccesses == accesses, "temporary release avoids persistence")
+players = {}; seats = {}; states = {}
+local FullData = loaders.DataService()
+Economy:Init(FullData); Reputation:Init(FullData)
+local FullRound = loaders.RoundService()
+FullRound:Init(FullData, Economy, Reputation, World, State)
+check(Config.TableCount == 20 and Config.MaxPlayers == 40, "twenty two-person tables")
+for id = 101, 140 do
+    check(FullData:Load(player(id)), "full server profile " .. id)
+    Economy:Join(id)
+end
+FullRound:Begin()
+check(#FullRound.pairs == 20 and FullRound.phase == "Playing", "forty players create twenty pairs")
+local previous = {}
+for _, p in ipairs(FullRound.pairs) do
+    check(seats[p.a][1] == p.index and seats[p.b][1] == p.index and seats[p.a][2] ~= seats[p.b][2], "full server seat mapping")
+    check(p.index <= Config.TableCount and FullRound:Snapshot(p.a).tableIndex == p.index, "valid table HUD index")
+    previous[p.a] = p.b; previous[p.b] = p.a
+end
+local last = FullRound.pairs[20]
+check(FullRound:Answer(last.a, last.nonce, 1), "table twenty accepts answer")
+check(FullRound:Snapshot(last.b).otherChoice == nil, "table twenty answer privacy")
+FullRound:Finish(); FullRound:Begin()
+check(#FullRound.pairs == 20, "forty players rotate without loss")
+for _, p in ipairs(FullRound.pairs) do check(previous[p.a] ~= p.b, "full server avoids previous partner") end
+players[140] = nil
+FullRound:Begin()
+check(#FullRound.pairs == 19, "thirty nine players create nineteen pairs")
+local waiting = 0
+for id = 101, 139 do if not FullRound.byUser[id] then waiting += 1 end end
+check(waiting == 1, "odd population has exactly one waiting player")
+-- One-sided exclusions must still prevent pairing in a large server.
+for id = 102, 139 do FullData:Get(101).avoided[tostring(id)] = true end
+FullRound:Begin()
+check(#FullRound.pairs == 19 and FullRound.byUser[101] == nil, "hard exclusions at capacity")
 print("PASS: " .. checks .. " server integration checks (mock services)")

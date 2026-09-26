@@ -45,36 +45,112 @@ function Rules.completionEligible(answerCount, activeSeconds, duration, config)
     return answerCount >= config.MinimumAnswers and activeSeconds >= duration * 0.5
 end
 
--- Maximum-cardinality matching (at most 12 players). Recent pairs carry a cost;
--- hard exclusions are never relaxed. Dynamic programming avoids greedy dead ends.
+-- General-graph maximum matching with odd-cycle contraction (blossom).
+-- No bitmasks or exponential subset search: supports all 40 users.
+-- Cost orders candidates and bounded local improvements; it is NOT a globally
+-- minimum-weight solver. Maximum pair count and hard exclusions remain exact.
 function Rules.match(ids, allowed, cost)
-    local memo = {}
-    local function solve(mask)
-        if memo[mask] then return memo[mask] end
-        local first
-        for i = 1, #ids do
-            if bit32.band(mask, bit32.lshift(1, i - 1)) == 0 then first = i; break end
+    local n = #ids
+    local graph, weights, mate = {}, {}, table.create(n, 0)
+    for i = 1, n do graph[i] = {}; weights[i] = {} end
+    for i = 1, n do for j = i + 1, n do
+        if allowed(ids[i], ids[j]) then
+            local w = cost(ids[i], ids[j])
+            weights[i][j] = w; weights[j][i] = w
+            table.insert(graph[i], j); table.insert(graph[j], i)
         end
-        if not first then return { count = 0, cost = 0, pairs = {} } end
-        local withFirst = bit32.bor(mask, bit32.lshift(1, first - 1))
-        local skipped = solve(withFirst)
-        local best = { count = skipped.count, cost = skipped.cost, pairs = skipped.pairs }
-        for j = first + 1, #ids do
-            local bit = bit32.lshift(1, j - 1)
-            if bit32.band(mask, bit) == 0 and allowed(ids[first], ids[j]) then
-                local tail = solve(bit32.bor(withFirst, bit))
-                local count, price = tail.count + 1, tail.cost + cost(ids[first], ids[j])
-                if count > best.count or (count == best.count and price < best.cost) then
-                    local result = { { ids[first], ids[j] } }
-                    for _, p in ipairs(tail.pairs) do table.insert(result, p) end
-                    best = { count = count, cost = price, pairs = result }
+    end end
+    for i = 1, n do
+        table.sort(graph[i], function(a, b)
+            return weights[i][a] < weights[i][b] or (weights[i][a] == weights[i][b] and a < b)
+        end)
+    end
+    local function augment(root)
+        local parent, base, used = table.create(n, 0), {}, {}
+        for i = 1, n do base[i] = i end
+        local queue, head = {root}, 1
+        used[root] = true
+        local function ancestor(a, b)
+            local seen = {}
+            while true do
+                a = base[a]; seen[a] = true
+                if mate[a] == 0 then break end
+                a = parent[mate[a]]
+            end
+            while true do
+                b = base[b]
+                if seen[b] then return b end
+                b = parent[mate[b]]
+            end
+        end
+        local function markPath(v, common, child, blossom)
+            while base[v] ~= common do
+                blossom[base[v]] = true; blossom[base[mate[v]]] = true
+                parent[v] = child; child = mate[v]; v = parent[mate[v]]
+            end
+        end
+        while head <= #queue do
+            local v = queue[head]; head += 1
+            for _, u in ipairs(graph[v]) do
+                if base[v] ~= base[u] and mate[v] ~= u then
+                    if u == root or (mate[u] ~= 0 and parent[mate[u]] ~= 0) then
+                        local common, blossom = ancestor(v, u), {}
+                        markPath(v, common, u, blossom); markPath(u, common, v, blossom)
+                        for i = 1, n do
+                            if blossom[base[i]] then
+                                base[i] = common
+                                if not used[i] then used[i] = true; table.insert(queue, i) end
+                            end
+                        end
+                    elseif parent[u] == 0 then
+                        parent[u] = v
+                        if mate[u] == 0 then
+                            local endpoint = u
+                            while endpoint ~= 0 do
+                                local previous = parent[endpoint]
+                                local following = mate[previous]
+                                mate[endpoint] = previous; mate[previous] = endpoint
+                                endpoint = following
+                            end
+                            return
+                        end
+                        used[mate[u]] = true; table.insert(queue, mate[u])
+                    end
                 end
             end
         end
-        memo[mask] = best
-        return best
     end
-    return solve(0).pairs
+    for i = 1, n do if mate[i] == 0 then augment(i) end end
+    -- Reduce repeated partners and prefer waiting players without reducing count.
+    for _ = 1, n do
+        local improved = false
+        for a = 1, n do
+            local b = mate[a]
+            if b > a then
+                for c = 1, n do
+                    local d = mate[c]
+                    if d == 0 then
+                        if weights[a][c] and weights[a][c] < weights[a][b] then
+                            mate[a] = c; mate[c] = a; mate[b] = 0; b = c; improved = true
+                        elseif weights[b][c] and weights[b][c] < weights[a][b] then
+                            mate[b] = c; mate[c] = b; mate[a] = 0; improved = true; break
+                        end
+                    elseif c > a and d > c and c ~= b then
+                        local old = weights[a][b] + weights[c][d]
+                        if weights[a][c] and weights[b][d] and weights[a][c] + weights[b][d] < old then
+                            mate[a] = c; mate[c] = a; mate[b] = d; mate[d] = b; b = c; improved = true
+                        elseif weights[a][d] and weights[b][c] and weights[a][d] + weights[b][c] < old then
+                            mate[a] = d; mate[d] = a; mate[b] = c; mate[c] = b; b = d; improved = true
+                        end
+                    end
+                end
+            end
+        end
+        if not improved then break end
+    end
+    local result = {}
+    for i = 1, n do if mate[i] > i then table.insert(result, {ids[i], ids[mate[i]]}) end end
+    return result
 end
 
 return Rules

@@ -1,5 +1,6 @@
 local Theme = require(game:GetService("ReplicatedStorage").RotationTalk.Theme)
-local World = { seats = {}, lobbyPosition = Vector3.new(0, 5, 53) }
+local Config = require(game:GetService("ReplicatedStorage").RotationTalk.Config)
+local World = { seats = {}, lobbyPosition = Vector3.new(0, 5, 117) }
 
 local function part(parent, name, size, cf, color, class, material)
     local p = Instance.new(class or "Part")
@@ -37,40 +38,40 @@ end
 
 local function buildShell(root)
     local shell = group(root, "AssemblyHall")
-    box(shell, "Foundation", Vector3.new(124, 2, 136), Vector3.new(0, -1.05, 0), Theme.DarkWood)
-    for i = 0, 30 do
+    box(shell, "Foundation", Vector3.new(168, 2, 200), Vector3.new(0, -1.05, 32), Theme.DarkWood)
+    for i = 0, 41 do
         local tint = i % 3 == 0 and Theme.LightOak or Theme.Oak
-        box(shell, "OakFloor" .. i, Vector3.new(3.96, 0.18, 136), Vector3.new(-60 + i * 4, 0), tint, Enum.Material.WoodPlanks)
+        box(shell, "OakFloor" .. i, Vector3.new(3.96, 0.18, 200), Vector3.new(-82 + i * 4, 0, 32), tint, Enum.Material.WoodPlanks)
     end
-    box(shell, "BackstageWall", Vector3.new(126, 29, 1.5), Vector3.new(0, 14, -68), Theme.Wall)
-    box(shell, "Ceiling", Vector3.new(126, 1, 138), Vector3.new(0, 29, 0), Theme.Paper)
-    for _, x in ipairs({ -62, 62 }) do
-        box(shell, "WallBase", Vector3.new(1.5, 7, 136), Vector3.new(x, 3.5, 0), Theme.WallTrim)
-        box(shell, "UpperWall", Vector3.new(1.5, 7, 136), Vector3.new(x, 25.5, 0), Theme.Wall)
-        for z = -56, 56, 28 do
+    box(shell, "BackstageWall", Vector3.new(170, 29, 1.5), Vector3.new(0, 14, -68), Theme.Wall)
+    box(shell, "Ceiling", Vector3.new(170, 1, 202), Vector3.new(0, 29, 32), Theme.Paper)
+    for _, x in ipairs({ -84, 84 }) do
+        box(shell, "WallBase", Vector3.new(1.5, 7, 200), Vector3.new(x, 3.5, 32), Theme.WallTrim)
+        box(shell, "UpperWall", Vector3.new(1.5, 7, 200), Vector3.new(x, 25.5, 32), Theme.Wall)
+        for z = -56, 112, 28 do
             box(shell, "WindowSill", Vector3.new(2.3, 0.5, 22), Vector3.new(x, 7.1, z), Theme.DarkWood)
             local glass = box(shell, "TallWindow", Vector3.new(0.4, 14.5, 22), Vector3.new(x, 14.6, z), Color3.fromRGB(180, 211, 211), Enum.Material.Glass)
             glass.Transparency = 0.42; glass.CastShadow = false
             box(shell, "WindowMullion", Vector3.new(1.7, 15, 0.3), Vector3.new(x, 14.6, z), Theme.Paper)
             box(shell, "WindowCrossbar", Vector3.new(1.7, 0.3, 22), Vector3.new(x, 14.6, z), Theme.Paper)
         end
-        for z = -68, 72, 28 do
-            box(shell, "WallColumn", Vector3.new(2.3, 22, 6), Vector3.new(x, 11, math.min(z, 68)), Theme.Wall)
+        for z = -68, 128, 28 do
+            box(shell, "WallColumn", Vector3.new(2.3, 22, 6), Vector3.new(x, 11, z), Theme.Wall)
         end
-        box(shell, "Skirting", Vector3.new(2, 0.8, 136), Vector3.new(x, 0.4, 0), Theme.DarkWood)
+        box(shell, "Skirting", Vector3.new(2, 0.8, 200), Vector3.new(x, 0.4, 32), Theme.DarkWood)
     end
-    for _, x in ipairs({ -37, 37 }) do
-        box(shell, "EntranceWall", Vector3.new(50, 29, 1.5), Vector3.new(x, 14, 68), Theme.Wall)
+    for _, x in ipairs({ -48, 48 }) do
+        box(shell, "EntranceWall", Vector3.new(72, 29, 1.5), Vector3.new(x, 14, 132), Theme.Wall)
     end
-    box(shell, "EntranceLintel", Vector3.new(24, 13, 1.5), Vector3.new(0, 22, 68), Theme.Wall)
+    box(shell, "EntranceLintel", Vector3.new(24, 13, 1.5), Vector3.new(0, 22, 132), Theme.Wall)
     for _, x in ipairs({ -5.7, 5.7 }) do
-        local door = box(shell, "GlassEntranceDoor", Vector3.new(11.3, 15, 0.5), Vector3.new(x, 7.5, 68), Color3.fromRGB(184, 209, 199), Enum.Material.Glass)
+        local door = box(shell, "GlassEntranceDoor", Vector3.new(11.3, 15, 0.5), Vector3.new(x, 7.5, 132), Color3.fromRGB(184, 209, 199), Enum.Material.Glass)
         door.Transparency = 0.4
-        box(shell, "DoorRail", Vector3.new(10.7, 0.4, 0.5), Vector3.new(x, 6.5, 67.6), Theme.Brass, Enum.Material.Metal)
+        box(shell, "DoorRail", Vector3.new(10.7, 0.4, 0.5), Vector3.new(x, 6.5, 131.6), Theme.Brass, Enum.Material.Metal)
     end
-    for z = -42, 42, 28 do
-        box(shell, "CeilingBeam", Vector3.new(124, 1.8, 1.2), Vector3.new(0, 27.6, z), Theme.WallTrim)
-        for _, x in ipairs({ -32, 0, 32 }) do
+    for z = -42, 112, 28 do
+        box(shell, "CeilingBeam", Vector3.new(168, 1.8, 1.2), Vector3.new(0, 27.6, z), Theme.WallTrim)
+        for _, x in ipairs({ -48, 0, 48 }) do
             local fixture = box(shell, "CeilingLight", Vector3.new(9, 0.2, 3), Vector3.new(x, 27.1, z), Theme.Chalk, Enum.Material.Neon)
             fixture.CastShadow = false
             if x == 0 then
@@ -114,9 +115,9 @@ end
 
 local function buildConversationTables(root, seats)
     local tables = group(root, "ConversationTables")
-    for i = 1, 6 do
-        local column, row = (i - 1) % 3, math.floor((i - 1) / 3)
-        local center = Vector3.new((column - 1) * 27, 0, -12 + row * 28)
+    for i = 1, Config.TableCount do
+        local column, row = (i - 1) % Config.TableColumns, math.floor((i - 1) / Config.TableColumns)
+        local center = Vector3.new((column - (Config.TableColumns - 1) / 2) * 28, 0, -20 + row * 28)
         local tableGroup = group(tables, "Table" .. i)
         box(tableGroup, "GreenFloorMat", Vector3.new(18, 0.08, 20), center + Vector3.new(0, 0.16, 0), Theme.Chalkboard, Enum.Material.Fabric)
         box(tableGroup, "DeskTop", Vector3.new(10, 0.65, 5.5), center + Vector3.new(0, 3.2, 0), Theme.LightOak, Enum.Material.Wood)
@@ -145,8 +146,8 @@ end
 local function buildFoyer(root)
     local foyer = group(root, "FoyerAndAudience")
     -- Decorative audience chairs are Parts, not matchmaking Seats.
-    for _, x in ipairs({ -48, 48 }) do
-        for z = -15, 30, 15 do
+    for _, x in ipairs({ -70, 70 }) do
+        for z = -15, 90, 15 do
             for offset = -3, 3, 6 do
                 local pos = Vector3.new(x + offset, 1.8, z)
                 box(foyer, "AudienceSeat", Vector3.new(3.7, 0.7, 3.8), pos, Theme.Curtain, Enum.Material.Fabric)
@@ -155,16 +156,16 @@ local function buildFoyer(root)
             end
         end
     end
-    framedBoard(foyer, "WelcomeBoard", Vector3.new(-31, 7, 45), Vector3.new(18, 10, 0.6), "오늘의 모임\n\n01  가볍게 고르기\n02  서로 이야기하기\n03  새로운 친구 만나기", 48)
-    framedBoard(foyer, "KindnessBoard", Vector3.new(31, 7, 45), Vector3.new(18, 10, 0.6), "우리 강당의 약속\n\n다른 취향도 존중해요\n개인정보는 지켜요\n불편하면 건너뛰어요", 48)
+    framedBoard(foyer, "WelcomeBoard", Vector3.new(-31, 7, 112), Vector3.new(18, 10, 0.6), "오늘의 모임\n\n01  가볍게 고르기\n02  서로 이야기하기\n03  새로운 친구 만나기", 48)
+    framedBoard(foyer, "KindnessBoard", Vector3.new(31, 7, 112), Vector3.new(18, 10, 0.6), "우리 강당의 약속\n\n다른 취향도 존중해요\n개인정보는 지켜요\n불편하면 건너뛰어요", 48)
     for _, x in ipairs({ -31, 31 }) do
-        for _, offset in ipairs({ -7, 7 }) do box(foyer, "NoticeBoardPost", Vector3.new(0.6, 7, 0.6), Vector3.new(x + offset, 3.5, 44.8), Theme.DarkWood) end
+        for _, offset in ipairs({ -7, 7 }) do box(foyer, "NoticeBoardPost", Vector3.new(0.6, 7, 0.6), Vector3.new(x + offset, 3.5, 111.8), Theme.DarkWood) end
     end
-    local spawn = part(foyer, "LobbySpawn", Vector3.new(14, 0.2, 10), CFrame.new(0, 0.25, 53), Theme.Chalkboard, "SpawnLocation", Enum.Material.Fabric)
+    local spawn = part(foyer, "LobbySpawn", Vector3.new(14, 0.2, 10), CFrame.new(0, 0.25, 117), Theme.Chalkboard, "SpawnLocation", Enum.Material.Fabric)
     spawn.Neutral = true; spawn.Duration = 0
     local decal = spawn:FindFirstChildOfClass("Decal"); if decal then decal:Destroy() end
-    for _, x in ipairs({ -54, 54 }) do
-        local pot = box(foyer, "Planter", Vector3.new(4, 3, 4), Vector3.new(x, 1.6, 52), Theme.WallTrim)
+    for _, x in ipairs({ -74, 74 }) do
+        local pot = box(foyer, "Planter", Vector3.new(4, 3, 4), Vector3.new(x, 1.6, 117), Theme.WallTrim)
         local leaves = box(foyer, "Plant", Vector3.new(5, 6, 5), pot.Position + Vector3.new(0, 4.3, 0), Theme.Chalkboard, Enum.Material.Grass)
         leaves.Shape = Enum.PartType.Ball; leaves.CanCollide = false
     end
